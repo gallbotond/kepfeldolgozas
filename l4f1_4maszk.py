@@ -3,6 +3,9 @@ import numpy as np
 
 # Betoltes
 img = cv2.imread("./img/kina2.jpg")
+
+img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
 img2 = img.copy()
 img3 = img.copy()
 img4 = img.copy()
