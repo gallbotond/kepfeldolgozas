@@ -5,6 +5,7 @@ import random
 
 # Load color image
 img = cv2.imread("./img/bond.jpg")
+img2 = img.copy()
 cv2.imshow("Original image", img)
 
 # Draw random black lines on the image
@@ -22,6 +23,8 @@ kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
 # Apply dilation with increasing kernel size
 for i in range(10):
     img = cv2.dilate(img, kernel)
+    cv2.imshow("Dilate", img)
+    cv2.waitKey(0)
     kernel_size += 2
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
 
@@ -29,11 +32,11 @@ cv2.imshow("Dilated image with increasing kernel size", img)
 
 # Draw random white lines on the image
 for i in range(100):
-    x1, y1 = random.randint(0, img.shape[1]), random.randint(0, img.shape[0])
-    x2, y2 = random.randint(0, img.shape[1]), random.randint(0, img.shape[0])
-    cv2.line(img, (x1, y1), (x2, y2), (255, 255, 255), 2)
+    x1, y1 = random.randint(0, img2.shape[1]), random.randint(0, img2.shape[0])
+    x2, y2 = random.randint(0, img2.shape[1]), random.randint(0, img2.shape[0])
+    cv2.line(img2, (x1, y1), (x2, y2), (255, 255, 255), 2)
 
-cv2.imshow("Random white lines", img)
+cv2.imshow("Random white lines", img2)
 
 # Define initial structuring element
 kernel_size = 3
@@ -41,12 +44,14 @@ kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
 
 # Apply erosion with increasing kernel size
 for i in range(10):
-    img = cv2.erode(img, kernel)
+    img2 = cv2.erode(img2, kernel)
+    cv2.imshow("Erode", img2)
+    cv2.waitKey(0)
     kernel_size += 2
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
 
 # Display result
-cv2.imshow("Eroded image with increasing kernel size", img)
+cv2.imshow("Eroded image with increasing kernel size", img2)
 cv2.waitKey(0)
 
 cv2.destroyAllWindows()

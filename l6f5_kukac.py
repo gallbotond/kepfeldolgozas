@@ -1,11 +1,8 @@
 import cv2
 import numpy as np
 
-# Load image
-input_image = cv2.imread("./img/kukac.png")
-
-# Convert image to grayscale
-gray_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
+# Load image as grayscale
+gray_image = cv2.imread("./img/kukac.png", cv2.IMREAD_GRAYSCALE)
 
 # Display the grayscale image
 cv2.imshow("Gray Image", gray_image)
@@ -36,6 +33,21 @@ blackhat_image = cv2.addWeighted(intensity_image, 0.9, gray_image, -0.1, 25)
 # Display the blackhat image
 cv2.imshow("Blackhat Image", blackhat_image)
 cv2.waitKey(0)
+
+# Assuming imKi is a NumPy array representing an image
+threshold_value = 10
+max_value = 255
+threshold_type = cv2.THRESH_BINARY
+_, output = cv2.threshold(tophat_image, threshold_value, max_value, threshold_type)
+
+cv2.imshow("Thresholded tophat Image", output)
+cv2.waitKey(0)
+
+_, output = cv2.threshold(blackhat_image, threshold_value, max_value, threshold_type)
+
+cv2.imshow("Thresholded blackhat Image 2", output)
+cv2.waitKey(0)
+
 cv2.destroyAllWindows()
 
 
