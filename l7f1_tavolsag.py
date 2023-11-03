@@ -41,6 +41,7 @@ import numpy as np
 
 # Load image
 input_image = cv2.imread("./img/amoba.png", cv2.IMREAD_GRAYSCALE)
+original_image = input_image.copy()
 
 # Display the grayscale intensity image
 cv2.imshow("Intensity Image", input_image)
@@ -65,7 +66,12 @@ for i in range(5):
 
 # Copy the dilated image to the original distance transform map where the original map is not zero
 distance_transform[input_image != 0] = dilated_image[input_image != 0]
+# distance_transform[distance_transform != 0] = input_image[distance_transform != 0]
+
+# dilated_image.copyTo(original_image)
 
 cv2.imshow("Distance Transform", distance_transform)
+cv2.imshow("Original Image", original_image)
+cv2.imshow("Dilated Image", dilated_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
