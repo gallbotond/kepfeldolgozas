@@ -1,59 +1,65 @@
 import cv2
 import numpy as np
 
-# 1. Olvassuk be a hod.jpg állományt színes képként.
-img = cv2.imread('./img/hod.jpg', cv2.IMREAD_COLOR)
+# Read the image as a color image
+image = cv2.imread("./img/hod.jpg", cv2.IMREAD_COLOR)
 
-# 2. const int R = 89;
+# Set the radius of the circle
 R = 89
 
-# 3. Split-eljük a képet és megjelenítve nézzük meg melyik színcsatornán a legerősebbek a körök és a továbbiakban csak azon dolgozzunk.
-b, g, r = cv2.split(img)
-circles = cv2.HoughCircles(g, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
-circles = np.uint16(np.around(circles))
-strongest_channel = g
+# Split the image into color channels
+channels = cv2.split(image)
 
-# 4. Lefuttatunk a Canny éldetektáló algoritmust.
-strongest_channel = cv2.Canny(strongest_channel, 100, 200)
+# Find the color channel with the strongest edges for the circles
+strongest_channel = None
+strongest_edges = 0
+for channel in channels:
+    edges = cv2.Canny(channel, 100, 200)
+    num_edges = cv2.countNonZero(edges)
+    if num_edges > strongest_edges:
+        strongest_channel = channel
+        strongest_edges = num_edges
+        print("Strongest edges: ", strongest_edges)
+        cv2.imshow("strongest channel", strongest_channel)
+        cv2.waitKey(0)
 
-# 5. Hozzunk létre egy 1 színcsatornás fekete képet és a közepére rajzoljunk egy fehér R sugarú kört.(imP)
-imP = np.zeros((img.shape[0], img.shape[1], 1), np.uint8)
-cv2.circle(imP, (img.shape[1] // 2, img.shape[0] // 2), R, (255, 255, 255), -1)
+# Create a black image with a white circle at the center
+imP = cv2.circle(np.zeros_like(strongest_channel), (strongest_channel.shape[1] // 2, strongest_channel.shape[0] // 2), R, 255, -1)
+cv2.imshow("imP", imP)
+cv2.waitKey(0)
 
-# 6. Készítünk egy olyan táblázatot, amelyikben benne vannak egy körnek a pontjai. Azok a pontok, amelyek rajta vannak egy, a keresett sugárral megegyező méretű körön. Ez a tömb a circPoint.
+# Create an empty list to store the points on the circle
 circPoint = []
-nrcPix = 0
-for i in range(imP.shape[0]):
-    for j in range(imP.shape[1]):
-        if imP[i, j] != 0:
-            circPoint.append((j - imP.shape[1] // 2, i - imP.shape[0] // 2))
-            imP[i, j] = 0
-            nrcPix += 1
 
-# 7. Bejárjuk az imP képet és minden nem fekete képpontnak a koordinátáit (középponthoz viszonyított koordinátákat) felvesszük a táblázatba. Közben minden képpont feketévé válik az imP képen.
-for i in range(strongest_channel.shape[0]):
-    for j in range(strongest_channel.shape[1]):
-        if strongest_channel[i, j] != 0:
-            for k in range(nrcPix):
-                x, y = circPoint[k]
-                if i + y >= 0 and i + y < strongest_channel.shape[0] and j + x >= 0 and j + x < strongest_channel.shape[1]:
-                    imP[i + y, j + x] += 1
+# Iterate over the imP image and add the coordinates of non-black pixels to circPoint
+for y in range(imP.shape[0]):
+    for x in range(imP.shape[1]):
+        if imP[y, x] != 0:
+            circPoint.append((x - imP.shape[1] // 2, y - imP.shape[0] // 2))
+            imP[y, x] = 0
 
-# 9. Bejárjuk a circPoint tömböt i-vel ha a körnek az (x, y) középponthoz viszonyított i-edik körpontja rajta van a képen, akkor kiolvassuk annak a képpontnak az intenzitását az imP képről és eggyel nagyobb értéket visszaírunk.
-for i in range(nrcPix):
-    x, y = circPoint[i]
-    if img.shape[0] // 2 + y >= 0 and img.shape[0] // 2 + y < img.shape[0] and img.shape[1] // 2 + x >= 0 and img.shape[1] // 2 + x < img.shape[1]:
-        if imP[img.shape[0] // 2 + y, img.shape[1] // 2 + x] > 0:
-            img[img.shape[0] // 2 + y, img.shape[1] // 2 + x] = (0, 0, 255)
+print(len(circPoint), circPoint)
 
-# 11. Az eredeti képre egy élénk színnel rajzolunk egy pmax középpontú R sugarú kört
-pmax = np.unravel_index(imP.argmax(), imP.shape)
-cv2.circle(img, (pmax[1], pmax[0]), R, (0, 255, 0), 2)
+# Iterate over the original image and update the intensity of points around detected edges
+for y in range(image.shape[0]):
+    for x in range(image.shape[1]):
+        if strongest_channel[y, x] > 0:
+            for i in range(len(circPoint)):
+                px = x + circPoint[i][0]
+                py = y + circPoint[i][1]
+                if 0 <= px < image.shape[1] and 0 <= py < image.shape[0]:
+                    image[py, px] += 1
 
-# 12. Az imP-ben a megtalált pmax helyét kifeketítjük(legalább egy 20 pixel sugarú kör területén)
-cv2.circle(imP, (pmax[1], pmax[0]), 20, (0, 0, 0), -1)
+# Find the brightest pixel in the black image
+_, max_val, _, max_loc = cv2.minMaxLoc(imP)
 
-# 13. Megjelenítjük az eredményt
-cv2.imshow('Result', img)
+# Draw a colored circle on the original image at the position of the brightest pixel
+cv2.circle(image, max_loc, R, (0, 0, 255), 2)
+
+# Darken the found position in the black image
+cv2.circle(imP, max_loc, 20, 0, -1)
+
+# Display the original image with the colored circle
+cv2.imshow("Original Image", image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

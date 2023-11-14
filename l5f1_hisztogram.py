@@ -62,7 +62,7 @@ def equalize_and_show_image(im):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-img = cv2.imread('img/cheguevara.jpg')
-show_image_and_histogram(img)
+# img = cv2.imread('img/cheguevara.jpg')
+# show_image_and_histogram(img)
 
-equalize_and_show_image(img)
+# equalize_and_show_image(img)
