@@ -3,7 +3,7 @@ import cv2 as cv
 import numpy as np
 def main(argv):
     
-    default_file = './img/felhoo.png'
+    default_file = './img/hod.jpg'
     filename = argv[0] if len(argv) > 0 else default_file
     # Loads an image
     src = cv.imread(cv.samples.findFile(filename), cv.IMREAD_COLOR)
