@@ -44,4 +44,6 @@ for i in range(10):
     cv2.imshow("Morphological gradient with increasing kernel size", gradient)
     cv2.waitKey(0)
 
+
+
 cv2.destroyAllWindows()

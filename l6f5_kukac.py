@@ -28,7 +28,7 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 
 # Perform the blackhat transformation on the image
-blackhat_image = cv2.addWeighted(intensity_image, 0.9, gray_image, -0.1, 25)
+blackhat_image = cv2.addWeighted(intensity_image, 0.5, gray_image, -0.1, 25)
 
 # Display the blackhat image
 cv2.imshow("Blackhat Image", blackhat_image)
@@ -38,12 +38,21 @@ cv2.waitKey(0)
 threshold_value = 10
 max_value = 255
 threshold_type = cv2.THRESH_BINARY
-_, output = cv2.threshold(tophat_image, threshold_value, max_value, threshold_type)
+# _, output = cv2.threshold(tophat_image, threshold_value, max_value, threshold_type)
+
+kernel_size = 11
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
+gradient = cv2.morphologyEx(tophat_image, cv2.MORPH_TOPHAT, kernel)
+_, output = cv2.threshold(gradient, threshold_value, max_value, threshold_type)
+
 
 cv2.imshow("Thresholded tophat Image", output)
 cv2.waitKey(0)
 
-_, output = cv2.threshold(blackhat_image, threshold_value, max_value, threshold_type)
+# _, output = cv2.threshold(blackhat_image, threshold_value, max_value, threshold_type)
+
+gradient = cv2.morphologyEx(blackhat_image, cv2.MORPH_BLACKHAT, gradient)
+_, output = cv2.threshold(gradient, threshold_value, max_value, threshold_type)
 
 cv2.imshow("Thresholded blackhat Image 2", output)
 cv2.waitKey(0)
